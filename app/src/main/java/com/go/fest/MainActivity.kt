@@ -53,13 +53,6 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
-
-        val retrievedButton = findViewById<Button>(idMap["button_detail"] ?: View.NO_ID)
-        retrievedButton?.setOnClickListener {
-            val intent = Intent(this, DetailsActivity::class.java)
-            startActivity(intent)
-        }
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -129,9 +122,10 @@ class MainActivity : AppCompatActivity() {
         )
         button.text = "Détails"
         button.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.button_style)
-        val buttonId = ViewCompat.generateViewId()
-        button.id = buttonId
-        idMap["button_detail"] = buttonId
+        button.setOnClickListener {
+            val intent = Intent(this, DetailsActivity::class.java)
+            startActivity(intent)
+        }
 
         rootLayout.addView(button)
 
