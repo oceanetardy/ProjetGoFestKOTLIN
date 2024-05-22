@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "gofest"
+rootProject.name = "ProjetGoFestKOTLIN"
 include(":app")
