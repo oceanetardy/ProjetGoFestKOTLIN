@@ -1,9 +1,12 @@
 package com.go.fest
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
@@ -22,6 +25,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var festivalList: ViewGroup
+    private val idMap = mutableMapOf<String, Int>()
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 val response = ApiClient.festivalApiService.getAllFestivals()
+
+                Log.i("Response", response.toString())
+
                 response.results.forEach { festival ->
                     createFestivalCardView(festival)
                 }
@@ -46,6 +53,13 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
+
+        val retrievedButton = findViewById<Button>(idMap["button_detail"] ?: View.NO_ID)
+        retrievedButton?.setOnClickListener {
+            val intent = Intent(this, DetailsActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -115,6 +129,9 @@ class MainActivity : AppCompatActivity() {
         )
         button.text = "Détails"
         button.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.button_style)
+        val buttonId = ViewCompat.generateViewId()
+        button.id = buttonId
+        idMap["button_detail"] = buttonId
 
         rootLayout.addView(button)
 
