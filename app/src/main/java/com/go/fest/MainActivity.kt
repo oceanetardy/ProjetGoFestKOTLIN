@@ -124,6 +124,8 @@ class MainActivity : AppCompatActivity() {
         button.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.button_style)
         button.setOnClickListener {
             val intent = Intent(this, DetailsActivity::class.java)
+            intent.putExtra("FESTIVAL_ID", festival.identifiant)
+
             startActivity(intent)
         }
 
