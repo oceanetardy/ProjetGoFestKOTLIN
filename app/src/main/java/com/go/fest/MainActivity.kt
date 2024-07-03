@@ -1,5 +1,3 @@
-//MainActivity.kt
-
 package com.go.fest
 
 import android.annotation.SuppressLint
@@ -226,6 +224,7 @@ class MainActivity : AppCompatActivity() {
 
         rootLayout.addView(dateTextView)
 
+        // Create Button
         val button = Button(this@MainActivity)
         button.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -234,7 +233,9 @@ class MainActivity : AppCompatActivity() {
         button.text = "Détails"
         button.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.button_style)
         button.setOnClickListener {
-            val intent = Intent(this@MainActivity, DetailsActivity::class.java)
+            val intent = Intent(this, DetailsActivity::class.java)
+            intent.putExtra("FESTIVAL_ID", festival.identifiant)
+
             startActivity(intent)
         }
 
