@@ -1,3 +1,5 @@
+//MainActivity.kt
+
 package com.go.fest
 
 import android.annotation.SuppressLint
@@ -6,28 +8,43 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
-import android.view.View
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.marginTop
-import androidx.core.view.setPadding
-import kotlinx.coroutines.DelicateCoroutinesApi
+import androidx.core.widget.NestedScrollView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var festivalList: ViewGroup
-    private val idMap = mutableMapOf<String, Int>()
+    private lateinit var scrollView: NestedScrollView
+    private lateinit var fab: FloatingActionButton
+    private lateinit var totalFestivalsTextView: TextView
+    private lateinit var filterButton: Button
+    private var offset = 0
+    private val limit = 20
+    private var isLoading = false
+    private var totalFestivals = 0
+    private var selectedRegion: String? = null
+    private var selectedDepartement: String? = null
+    private var selectedCity: String? = null
+    private var selectedDiscipline: String? = null
 
-    @OptIn(DelicateCoroutinesApi::class)
+    private var departments: List<String> = emptyList()
+    private var cities: List<String> = emptyList()
+    private var disciplines: List<String> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,20 +56,124 @@ class MainActivity : AppCompatActivity() {
         }
 
         festivalList = findViewById(R.id.festival_list)
+        scrollView = findViewById(R.id.scrollView)
+        fab = findViewById(R.id.fab)
+        totalFestivalsTextView = findViewById(R.id.total_festivals)
+        filterButton = findViewById(R.id.btn_filter)
 
+        scrollView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+            if (!scrollView.canScrollVertically(1) && scrollY > oldScrollY && !isLoading) {
+                loadMoreFestivals()
+            }
+        }
+
+        fab.setOnClickListener {
+            scrollView.smoothScrollTo(0, 0)
+        }
+
+        filterButton.setOnClickListener {
+            showFilterMenu()
+        }
+
+        loadFestivalsAndFilters()
+    }
+
+    private fun showFilterMenu() {
+        val popup = PopupMenu(this, filterButton)
+        popup.menuInflater.inflate(R.menu.filter_menu, popup.menu)
+        popup.setOnMenuItemClickListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.filter_departement -> {
+                    showFilterDialog("departement")
+                }
+                R.id.filter_ville -> {
+                    showFilterDialog("ville")
+                }
+                R.id.filter_discipline -> {
+                    showFilterDialog("discipline")
+                }
+            }
+            true
+        }
+        popup.show()
+    }
+
+    private fun showFilterDialog(filterType: String) {
+        val options = when (filterType) {
+            "departement" -> getDepartments()
+            "ville" -> getCities()
+            "discipline" -> getDisciplines()
+            else -> emptyList()
+        }
+
+        val builder = AlertDialog.Builder(this@MainActivity)
+        builder.setTitle("Select $filterType")
+        builder.setItems(options.toTypedArray()) { _, which ->
+            when (filterType) {
+                "departement" -> selectedDepartement = options[which]
+                "ville" -> selectedCity = options[which]
+                "discipline" -> selectedDiscipline = options[which]
+            }
+            Log.d("MainActivity", "Selected $filterType: ${options[which]}")
+            resetAndLoadFestivals()
+        }
+
+        builder.create().show()
+    }
+
+
+    private fun getDepartments(): List<String> {
+        return departments // Replace with your logic to fetch departments from data or API
+    }
+
+    private fun getCities(): List<String> {
+        return cities // Replace with your logic to fetch cities from data or API
+    }
+
+    private fun getDisciplines(): List<String> {
+        return disciplines // Replace with your logic to fetch disciplines from data or API
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun resetAndLoadFestivals() {
+        offset = 0
+        totalFestivals = 0
+        festivalList.removeAllViews()
+        loadMoreFestivals()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun loadMoreFestivals() {
+        isLoading = true
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                val response = ApiClient.festivalApiService.getAllFestivals()
-
-                Log.i("Response", response.toString())
+                Log.d("MainActivity", "Loading festivals with filters - Region: $selectedRegion, Departement: $selectedDepartement, City: $selectedCity, Discipline: $selectedDiscipline")
+                val response = ApiClient.festivalApiService.getFestivals(
+                    limit,
+                    offset,
+                    selectedDepartement,
+                    selectedCity,
+                    selectedDiscipline
+                )
+                offset += limit
+                totalFestivals += response.results.size
+                updateTotalFestivalsTextView()
 
                 response.results.forEach { festival ->
                     createFestivalCardView(festival)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("MainActivity", "Error loading festivals: ${e.message}", e)
+            } finally {
+                isLoading = false
             }
         }
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    private fun updateTotalFestivalsTextView() {
+        totalFestivalsTextView.text = "Total: $totalFestivals"
     }
 
     @SuppressLint("SetTextI18n")
@@ -60,10 +181,9 @@ class MainActivity : AppCompatActivity() {
         val rootLayout = LinearLayout(this@MainActivity)
         val layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
-        layoutParams.setMargins(10, 10, 10, 10)
         rootLayout.setPadding(20, 20, 20, 20)
         rootLayout.layoutParams = layoutParams
         rootLayout.orientation = LinearLayout.VERTICAL
@@ -71,64 +191,87 @@ class MainActivity : AppCompatActivity() {
         rootLayout.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.item_festival)
 
         val titleTextView = TextView(this@MainActivity)
-        titleTextView.setLayoutParams(
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+        titleTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
         titleTextView.text = festival.nom_du_festival
-        titleTextView.setGravity(Gravity.CENTER)
+        titleTextView.gravity = Gravity.CENTER
         titleTextView.textSize = 24f
         titleTextView.setTextColor(Color.BLACK)
 
         rootLayout.addView(titleTextView)
 
         val typeTextView = TextView(this@MainActivity)
-        typeTextView.setLayoutParams(
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+        typeTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
         typeTextView.text = festival.discipline_dominante
-        typeTextView.setGravity(Gravity.CENTER)
+        typeTextView.gravity = Gravity.CENTER
         typeTextView.textSize = 18f
         typeTextView.setTextColor(Color.BLACK)
 
         rootLayout.addView(typeTextView)
 
         val dateTextView = TextView(this@MainActivity)
-        dateTextView.setLayoutParams(
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+        dateTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
         dateTextView.text = festival.periode_principale_de_deroulement_du_festival
-        dateTextView.setGravity(Gravity.CENTER)
+        dateTextView.gravity = Gravity.CENTER
         dateTextView.textSize = 18f
         dateTextView.setTextColor(Color.BLACK)
 
         rootLayout.addView(dateTextView)
 
-        // Create Button
         val button = Button(this@MainActivity)
-        button.setLayoutParams(
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+        button.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
         button.text = "Détails"
         button.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.button_style)
         button.setOnClickListener {
-            val intent = Intent(this, DetailsActivity::class.java)
+            val intent = Intent(this@MainActivity, DetailsActivity::class.java)
             startActivity(intent)
         }
 
         rootLayout.addView(button)
 
         festivalList.addView(rootLayout)
+    }
+
+    private fun loadFestivalsAndFilters() {
+        isLoading = true
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                val response = ApiClient.festivalApiService.getFestivals(
+                    limit,
+                    offset,
+                    selectedDepartement,
+                    selectedCity,
+                    selectedDiscipline
+                )
+                offset += limit
+                totalFestivals += response.results.size
+                updateTotalFestivalsTextView()
+
+                // Extract unique departments, cities, and disciplines from fetched data
+                departments = response.results.mapNotNull { it.departement_principal_de_deroulement }.distinct()
+                cities = response.results.mapNotNull { it.commune_principale_de_deroulement }.distinct()
+                disciplines = response.results.mapNotNull { it.discipline_dominante }.distinct()
+
+                // Initially load festivals
+                response.results.forEach { festival ->
+                    createFestivalCardView(festival)
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error loading festivals and filters: ${e.message}", e)
+            } finally {
+                isLoading = false
+            }
+        }
     }
 }

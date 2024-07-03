@@ -1,8 +1,11 @@
+// ApiCall.kt
+
 package com.go.fest
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 data class Festival(
     val nom_du_festival: String?,
@@ -41,7 +44,13 @@ data class FestivalResponse(
 
 interface FestivalApiService {
     @GET("api/explore/v2.1/catalog/datasets/festivals-global-festivals-_-pl/records")
-    suspend fun getAllFestivals(): FestivalResponse
+    suspend fun getFestivals(
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("refine.departement_principal_de_deroulement") departement: String? = null,
+        @Query("refine.commune_principale_de_deroulement") city: String? = null,
+        @Query("refine.discipline_dominante") discipline: String? = null
+    ): FestivalResponse
 }
 
 object ApiClient {
