@@ -82,6 +82,16 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/festivalPeriod" />
+
+            <Button
+                android:id="@+id/buttonBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onBackButtonClicked"
+                android:backgroundTint="@color/buttonColor"
+                android:text="Retour"
+                tools:layout_editor_absoluteY="10dp"
+                tools:ignore="MissingConstraints" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -171,6 +181,7 @@
                 app:layout_constraintHorizontal_bias="0.49"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/festivalDepartment" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -61,6 +62,14 @@ class DetailsActivity : AppCompatActivity() {
             Log.e("DetailsActivity", "Aucun identifiant de festival trouvé")
         }
     }
+    fun onBackButtonClicked(view: View) {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish() // Optional, depending on whether you want to finish DetailsActivity when going back
+    }
+
+
 
     override fun onResume() {
         super.onResume()
