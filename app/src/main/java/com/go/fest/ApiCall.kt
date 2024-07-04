@@ -51,6 +51,12 @@ interface FestivalApiService {
         @Query("refine.commune_principale_de_deroulement") city: String? = null,
         @Query("refine.discipline_dominante") discipline: String? = null
     ): FestivalResponse
+
+    @GET("api/explore/v2.1/catalog/datasets/festivals-global-festivals-_-pl/records")
+    suspend fun getOneFestival(
+        @Query("where") whereClause: String,
+        @Query("limit") limit: Int = 1
+    ): FestivalResponse
 }
 
 object ApiClient {

@@ -17,6 +17,7 @@ import org.osmdroid.views.overlay.Marker
 
 class DetailsActivity : AppCompatActivity() {
     private lateinit var mapView: MapView
+    private lateinit var festivalIdTextView: TextView
     private lateinit var festivalName: TextView
     private lateinit var festivalDiscipline: TextView
     private lateinit var festivalAddress: TextView
@@ -34,10 +35,11 @@ class DetailsActivity : AppCompatActivity() {
         Configuration.getInstance().load(applicationContext, getPreferences(MODE_PRIVATE))
         setContentView(R.layout.activity_details)
 
-        mapView = findViewById<MapView>(R.id.mapview)
+        mapView = findViewById(R.id.mapview)
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
         mapView.setMultiTouchControls(true)
 
+        festivalIdTextView = findViewById(R.id.festivalId)
         festivalName = findViewById(R.id.festivalName)
         festivalDiscipline = findViewById(R.id.festivalDiscipline)
         festivalAddress = findViewById(R.id.festivalAddress)
@@ -71,40 +73,43 @@ class DetailsActivity : AppCompatActivity() {
     private fun fetchFestivalDetails(festivalId: String) {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
-                val response = ApiClient.festivalApiService.getAllFestivals()
+                val whereClause = "identifiant like \"%$festivalId%\""
+
+                val response = ApiClient.festivalApiService.getOneFestival(whereClause)
+
                 val festival = response.results.find { it.identifiant == festivalId }
+
                 if (festival != null) {
+                    Log.d("DetailsActivity", "Festival trouvé: $festival")
+
                     createFestivalDetailsCardView(festival)
                     updateMapWithFestivalLocation(festival)
                 } else {
-                    Log.e("DetailsActivity", "Festival non trouvé pour l'ID: $festivalId")
+                    Log.e("DetailsActivity", "Aucun festival trouvé pour l'ID: $festivalId")
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("DetailsActivity", "Erreur lors de la récupération des détails du festival: ${e.message}", e)
             }
         }
     }
 
     private fun createFestivalDetailsCardView(festival: Festival) {
-        val rootLayout = LinearLayout(this@DetailsActivity)
-
-        festivalName.text = festival.nom_du_festival
-        festivalDiscipline.text = festival.discipline_dominante
-        festivalAddress.text = festival.adresse_postale
-        festivalCodeCpCommune.text = festival.code_postal_de_la_commune_principale_de_deroulement
-        festivalCommune.text = festival.commune_principale_de_deroulement
-        festivalDepartment.text = festival.departement_principal_de_deroulement
-        festivalRegion.text = festival.region_principale_de_deroulement
-        festivalSiteWeb.text = festival.site_internet_du_festival
-        festivalMail.text = festival.adresse_e_mail
-        festivalPeriod.text = festival.periode_principale_de_deroulement_du_festival
-
-
+        festivalIdTextView.text = festival.identifiant ?: "Identifiant du festival non renseigné"
+        festivalName.text = festival.nom_du_festival ?: "Nom du festival non renseigné"
+        festivalDiscipline.text = festival.discipline_dominante ?: "Discipline du festival non renseignée"
+        festivalAddress.text = festival.adresse_postale ?: "Adresse du festival non renseignée"
+        festivalCodeCpCommune.text = festival.code_postal_de_la_commune_principale_de_deroulement ?: "Code postal du festival non renseigné"
+        festivalCommune.text = festival.commune_principale_de_deroulement ?: "Commune du festival non renseignée"
+        festivalDepartment.text = festival.departement_principal_de_deroulement ?: "Département du festival non renseigné"
+        festivalRegion.text = festival.region_principale_de_deroulement ?: "Région du festival non renseignée"
+        festivalSiteWeb.text = festival.site_internet_du_festival ?: "Site web du festival non renseigné"
+        festivalMail.text = festival.adresse_e_mail ?: "Contact du festival non renseigné"
+        festivalPeriod.text = festival.periode_principale_de_deroulement_du_festival ?: "Période du festival non renseignée"
     }
 
     private fun updateMapWithFestivalLocation(festival: Festival) {
-        val latitude = 45.4333 // TODO
-        val longitude = 4.4 // TODO
+        val latitude = 45.4333 // TODO: Update with actual latitude
+        val longitude = 4.4 // TODO: Update with actual longitude
         val zoomLevel = 15.0
 
         val mapController = mapView.controller
@@ -115,7 +120,7 @@ class DetailsActivity : AppCompatActivity() {
         val startMarker = Marker(mapView)
         startMarker.position = GeoPoint(latitude, longitude)
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.title = festival.nom_du_festival
+        startMarker.title = festival.nom_du_festival ?: "N/A"
         mapView.overlays.add(startMarker)
     }
 }
