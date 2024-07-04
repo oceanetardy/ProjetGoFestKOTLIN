@@ -35,7 +35,14 @@ data class Festival(
     val sous_categorie_livre_et_litterature: String?,
     val periode_principale_de_deroulement_du_festival: String?,
     val identifiant_agence_a: String?,
-    val identifiant: String?
+    val identifiant: String?,
+    val geocodage_xy: GeocodageXY?
+
+)
+
+data class GeocodageXY(
+    val lon: Double?,
+    val lat: Double?
 )
 
 data class FestivalResponse(

@@ -1,6 +1,8 @@
 package com.go.fest
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
@@ -108,19 +110,18 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     private fun updateMapWithFestivalLocation(festival: Festival) {
-        val latitude = 45.4333 // TODO: Update with actual latitude
-        val longitude = 4.4 // TODO: Update with actual longitude
+        val latitude = festival.geocodage_xy?.lat ?: 0.0
+        val longitude = festival.geocodage_xy?.lon ?: 0.0
         val zoomLevel = 15.0
 
         val mapController = mapView.controller
         mapController.setZoom(zoomLevel)
         mapController.setCenter(GeoPoint(latitude, longitude))
 
-        // Ajouter un marqueur sur la carte
         val startMarker = Marker(mapView)
         startMarker.position = GeoPoint(latitude, longitude)
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.title = festival.nom_du_festival ?: "N/A"
+        startMarker.title = festival.nom_du_festival ?: "Nom du festival non renseigné"
         mapView.overlays.add(startMarker)
     }
 }
