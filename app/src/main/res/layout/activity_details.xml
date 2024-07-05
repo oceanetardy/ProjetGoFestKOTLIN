@@ -40,7 +40,7 @@
                 android:id="@+id/festivalDiscipline"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="88dp"
+                android:layout_marginTop="104dp"
                 android:text="Discipline dominante"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -52,34 +52,34 @@
                 android:id="@+id/festivalId"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:text="Identifiant du festival"
                 android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/festivalName"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.539"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/festivalDiscipline" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.372" />
 
             <TextView
                 android:id="@+id/festivalPeriod"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:text="Période de festival"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/festivalId" />
+                app:layout_constraintTop_toBottomOf="@+id/festivalDiscipline" />
 
             <TextView
                 android:id="@+id/festivalSiteWeb"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="24dp"
                 android:text="Site Web"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/festivalPeriod" />
 
@@ -87,7 +87,6 @@
                 android:id="@+id/buttonBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:backgroundTint="@color/buttonColor"
                 android:onClick="onBackButtonClicked"
                 android:text="Retour"
@@ -120,9 +119,11 @@
                 android:id="@+id/festivalAddress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Adresse"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
