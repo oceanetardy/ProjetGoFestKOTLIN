@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Dark theme colors -->
+    <color name="primaryColor">#BB86FC</color>
+    <color name="primaryVariantColor">#3700B3</color>
+    <color name="secondaryColor">#03DAC6</color>
+    <color name="backgroundColor">#121212</color>
+    <color name="surfaceColor">#121212</color>
+    <color name="textColor">#FFFFFF</color>
+    <color name="buttonColor">#264653</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="navbarColor">#002839</color>
-    <color name="buttonColor">#264653</color>
     <color name="cardColor">#89ECFA</color>
+
+    <color name="primaryColorLight">#E1C8FF</color>
+    <color name="primaryVariantColorLight">#000000</color>
+    <color name="secondaryColorLight">#006A60</color>
+    <color name="backgroundColorLight">#FFFFFF</color>
+    <color name="surfaceColorLight">#DAA9A9</color>
+    <color name="textColorLight">#000000</color>
+    <color name="buttonColorLight">#63CAF4</color>
+    <color name="navbarColorLight">#027DB1</color>
+    <color name="cardColorLight">#28CBE1</color>
 </resources>
