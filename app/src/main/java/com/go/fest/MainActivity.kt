@@ -3,6 +3,7 @@ package com.go.fest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -195,6 +196,7 @@ class MainActivity : AppCompatActivity() {
         titleTextView.gravity = Gravity.CENTER
         titleTextView.textSize = 24f
         titleTextView.setTextColor(Color.BLACK)
+        titleTextView.setTypeface(null, Typeface.BOLD)
 
         rootLayout.addView(titleTextView)
 
@@ -221,6 +223,30 @@ class MainActivity : AppCompatActivity() {
         dateTextView.setTextColor(Color.BLACK)
 
         rootLayout.addView(dateTextView)
+
+        val cityTextView = TextView(this@MainActivity)
+        cityTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        cityTextView.text = festival.commune_principale_de_deroulement
+        cityTextView.gravity = Gravity.CENTER
+        cityTextView.textSize = 18f
+        cityTextView.setTextColor(Color.BLACK)
+
+        rootLayout.addView(cityTextView)
+
+        val departmentTextView = TextView(this@MainActivity)
+        departmentTextView.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        departmentTextView.text = festival.departement_principal_de_deroulement
+        departmentTextView.gravity = Gravity.CENTER
+        departmentTextView.textSize = 18f
+        departmentTextView.setTextColor(Color.BLACK)
+
+        rootLayout.addView(departmentTextView)
 
         // Create Button
         val button = Button(this@MainActivity)
