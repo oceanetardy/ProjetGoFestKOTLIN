@@ -50,8 +50,8 @@
 
             <TextView
                 android:id="@+id/festivalId"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="153dp"
+                android:layout_height="25dp"
                 android:text="Identifiant du festival"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@+id/festivalName"
@@ -96,6 +96,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/festivalMail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Contact Mail"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/festivalSiteWeb" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -120,7 +133,7 @@
                 android:id="@+id/festivalAddress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="60dp"
                 android:text="Adresse"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -176,18 +189,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/festivalCommune" />
 
-            <TextView
-                android:id="@+id/festivalMail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Contact Mail"
-                android:textSize="16sp"
+            <Button
+                android:id="@+id/btnOpenInMaps"
+                android:layout_width="166dp"
+                android:layout_height="47dp"
+                android:backgroundTint="@color/buttonColor"
+                android:onClick="openInMaps"
+                android:text="Ouvrir avec Maps"
+                app:layout_constraintBottom_toTopOf="@+id/festivalAddress"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.49"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/festivalDepartment" />
-
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

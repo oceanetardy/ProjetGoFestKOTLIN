@@ -6,12 +6,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
@@ -158,4 +160,59 @@ class DetailsActivity : AppCompatActivity() {
         mapView.overlays.add(startMarker)
         mapView.invalidate()
     }
+
+    fun openInMaps(view: View) {
+        val festivalId = intent.getStringExtra("FESTIVAL_ID")
+
+        if (festivalId != null) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                try {
+                    val whereClause = "identifiant like \"%$festivalId%\""
+
+                    val response = ApiClient.festivalApiService.getOneFestival(whereClause)
+
+                    val festival = response.results.find { it.identifiant == festivalId }
+
+                    if (festival != null) {
+                        openInMaps(festival)
+                    } else {
+                        Log.e("DetailsActivity", "Aucun festival trouvé pour l'ID: $festivalId")
+                    }
+                } catch (e: Exception) {
+                    Log.e("DetailsActivity", "Erreur lors de la récupération des détails du festival: ${e.message}", e)
+                }
+            }
+        } else {
+            Log.e("DetailsActivity", "Aucun identifiant de festival trouvé")
+        }
+    }
+
+    private fun openInMaps(festival: Festival) {
+        val latitude = festival.geocodage_xy?.lat ?: 0.0
+        val longitude = festival.geocodage_xy?.lon ?: 0.0
+        Log.d("DetailsActivity", "Latitude: $latitude, Longitude: $longitude")
+
+        val uri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.setPackage("com.google.android.apps.maps") // Utilisation explicite de Google Maps
+
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            // Si Google Maps n'est pas trouvé, essayez d'ouvrir avec un navigateur web
+            openInBrowser(uri.toString())
+        }
+    }
+
+    private fun openInBrowser(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Navigateur web non trouvé.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
 }
