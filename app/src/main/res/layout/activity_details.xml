@@ -91,8 +91,8 @@
                 android:backgroundTint="@color/buttonColor"
                 android:onClick="onBackButtonClicked"
                 android:text="Retour"
-                app:layout_constraintEnd_toStartOf="@+id/festivalName"
-                app:layout_constraintHorizontal_bias="0.4"
+                app:layout_constraintEnd_toStartOf="@+id/festivalId"
+                app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="MissingConstraints" />
