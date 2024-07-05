@@ -1,8 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Gofest" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Base application theme -->
+    <style name="Base.Theme.Gofest" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Light theme customization -->
+        <item name="colorPrimary">@color/primaryColorLight</item>
+        <item name="colorPrimaryVariant">@color/primaryVariantColorLight</item>
+        <item name="colorSecondary">@color/secondaryColorLight</item>
+        <item name="android:colorBackground">@color/backgroundColorLight</item>
+        <item name="colorSurface">@color/surfaceColorLight</item>
+        <item name="android:textColor">@color/textColorLight</item>
     </style>
 
     <style name="Theme.Gofest" parent="Base.Theme.Gofest" />

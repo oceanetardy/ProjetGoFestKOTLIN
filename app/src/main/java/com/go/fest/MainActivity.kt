@@ -119,17 +119,16 @@ class MainActivity : AppCompatActivity() {
         builder.create().show()
     }
 
-
     private fun getDepartments(): List<String> {
-        return departments // Replace with your logic to fetch departments from data or API
+        return departments
     }
 
     private fun getCities(): List<String> {
-        return cities // Replace with your logic to fetch cities from data or API
+        return cities
     }
 
     private fun getDisciplines(): List<String> {
-        return disciplines // Replace with your logic to fetch disciplines from data or API
+        return disciplines
     }
 
     @SuppressLint("SetTextI18n")
@@ -167,7 +166,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun updateTotalFestivalsTextView() {
