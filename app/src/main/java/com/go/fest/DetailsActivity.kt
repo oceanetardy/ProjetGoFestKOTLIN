@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
@@ -113,7 +115,15 @@ class DetailsActivity : AppCompatActivity() {
         festivalCommune.text = festival.commune_principale_de_deroulement ?: "Commune du festival non renseignée"
         festivalDepartment.text = festival.departement_principal_de_deroulement ?: "Département du festival non renseigné"
         festivalRegion.text = festival.region_principale_de_deroulement ?: "Région du festival non renseignée"
-        festivalSiteWeb.text = festival.site_internet_du_festival ?: "Site web du festival non renseigné"
+
+        if (festival.site_internet_du_festival.isNullOrBlank()) {
+            festivalSiteWeb.text = "Site web du festival non renseigné"
+        } else {
+            val linkText = "<a href=\"${festival.site_internet_du_festival}\">${festival.site_internet_du_festival}</a>"
+            festivalSiteWeb.text = Html.fromHtml(linkText, Html.FROM_HTML_MODE_LEGACY)
+            festivalSiteWeb.movementMethod = LinkMovementMethod.getInstance()
+        }
+
         festivalMail.text = festival.adresse_e_mail ?: "Contact du festival non renseigné"
         festivalPeriod.text = festival.periode_principale_de_deroulement_du_festival ?: "Période du festival non renseignée"
     }
