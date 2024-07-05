@@ -2,16 +2,19 @@ package com.go.fest
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
@@ -64,14 +67,13 @@ class DetailsActivity : AppCompatActivity() {
             Log.e("DetailsActivity", "Aucun identifiant de festival trouvé")
         }
     }
+
     fun onBackButtonClicked(view: View) {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
-        finish() // Optional, depending on whether you want to finish DetailsActivity when going back
+        finish()
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -133,6 +135,8 @@ class DetailsActivity : AppCompatActivity() {
         val longitude = festival.geocodage_xy?.lon ?: 0.0
         val zoomLevel = 15.0
 
+        Log.d("DetailsActivity", "Latitude: $latitude, Longitude: $longitude")
+
         val mapController = mapView.controller
         mapController.setZoom(zoomLevel)
         mapController.setCenter(GeoPoint(latitude, longitude))
@@ -141,6 +145,17 @@ class DetailsActivity : AppCompatActivity() {
         startMarker.position = GeoPoint(latitude, longitude)
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         startMarker.title = festival.nom_du_festival ?: "Nom du festival non renseigné"
+
+        val vectorDrawable: Drawable? = VectorDrawableCompat.create(resources, R.drawable.marker_fest, null)?.mutate()
+        vectorDrawable?.let {
+            val width = resources.getDimensionPixelSize(R.dimen.marker_width)
+            val height = resources.getDimensionPixelSize(R.dimen.marker_height)
+            it.setBounds(0, 0, width, height)
+        }
+
+        startMarker.icon = vectorDrawable
+
         mapView.overlays.add(startMarker)
+        mapView.invalidate()
     }
 }
