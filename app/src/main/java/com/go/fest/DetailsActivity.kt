@@ -2,9 +2,6 @@ package com.go.fest
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +9,7 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +36,7 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var festivalSiteWeb: TextView
     private lateinit var festivalMail: TextView
     private lateinit var festivalPeriod: TextView
+    private lateinit var progressBar: ProgressBar
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +59,8 @@ class DetailsActivity : AppCompatActivity() {
         festivalSiteWeb = findViewById(R.id.festivalSiteWeb)
         festivalMail = findViewById(R.id.festivalMail)
         festivalPeriod = findViewById(R.id.festivalPeriod)
+        progressBar = findViewById(R.id.progressBar)
+        progressBar.visibility = View.VISIBLE
 
         val festivalId = intent.getStringExtra("FESTIVAL_ID")
 
@@ -67,6 +68,7 @@ class DetailsActivity : AppCompatActivity() {
             fetchFestivalDetails(festivalId)
         } else {
             Log.e("DetailsActivity", "Aucun identifiant de festival trouvé")
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -106,6 +108,8 @@ class DetailsActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 Log.e("DetailsActivity", "Erreur lors de la récupération des détails du festival: ${e.message}", e)
+            } finally {
+                progressBar.visibility = View.GONE
             }
         }
     }
@@ -212,7 +216,4 @@ class DetailsActivity : AppCompatActivity() {
             Toast.makeText(this, "Navigateur web non trouvé.", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
 }
