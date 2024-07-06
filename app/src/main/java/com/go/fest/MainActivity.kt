@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var totalFestivalsTextView: TextView
     private lateinit var filterButton: Button
     private lateinit var btnMapMode: Button
+    private lateinit var progressBar: ProgressBar
+
     private var offset = 0
     private val limit = 20
     private var isLoading = false
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private var cities: List<String> = emptyList()
     private var disciplines: List<String> = emptyList()
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -61,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         totalFestivalsTextView = findViewById(R.id.total_festivals)
         filterButton = findViewById(R.id.btn_filter)
         btnMapMode = findViewById(R.id.btn_map_mode)
-
+        progressBar = findViewById(R.id.progress_bar)
 
         scrollView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (!scrollView.canScrollVertically(1) && scrollY > oldScrollY && !isLoading) {
@@ -151,6 +156,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun loadMoreFestivals() {
         isLoading = true
+        showLoading()
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 Log.d("MainActivity", "Loading festivals with filters - Region: $selectedRegion, Departement: $selectedDepartement, City: $selectedCity, Discipline: $selectedDiscipline")
@@ -169,9 +175,11 @@ class MainActivity : AppCompatActivity() {
                     createFestivalCardView(festival)
                 }
             } catch (e: Exception) {
-                Log.e("MainActivity", "Error loading festivals: ${e.message}", e)
+                Log.e("MainActivity", "Erreur lors du chargement des festivals: ${e.message}", e)
+                showErrorDialog("Erreur lors du chargement des festivals. Vérifiez votre connexion internet et réessayez.")
             } finally {
                 isLoading = false
+                hideLoading()
             }
         }
     }
@@ -282,6 +290,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFestivalsAndFilters() {
         isLoading = true
+        showLoading()
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 val response = ApiClient.festivalApiService.getFestivals(
@@ -305,10 +314,28 @@ class MainActivity : AppCompatActivity() {
                     createFestivalCardView(festival)
                 }
             } catch (e: Exception) {
-                Log.e("MainActivity", "Error loading festivals and filters: ${e.message}", e)
+                Log.e("MainActivity", "Erreur lors du chargement des festivals: ${e.message}", e)
+                showErrorDialog("Erreur lors du chargement des festivals. Vérifiez votre connexion internet et réessayez.")
             } finally {
                 isLoading = false
+                hideLoading()
             }
         }
+    }
+
+    private fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        progressBar.visibility = View.GONE
+    }
+
+    private fun showErrorDialog(message: String) {
+        AlertDialog.Builder(this@MainActivity)
+            .setTitle("Erreur")
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 }
