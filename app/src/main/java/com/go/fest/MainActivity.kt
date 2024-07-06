@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fab: FloatingActionButton
     private lateinit var totalFestivalsTextView: TextView
     private lateinit var filterButton: Button
+    private lateinit var btnMapMode: Button
     private var offset = 0
     private val limit = 20
     private var isLoading = false
@@ -59,6 +60,8 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.fab)
         totalFestivalsTextView = findViewById(R.id.total_festivals)
         filterButton = findViewById(R.id.btn_filter)
+        btnMapMode = findViewById(R.id.btn_map_mode)
+
 
         scrollView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (!scrollView.canScrollVertically(1) && scrollY > oldScrollY && !isLoading) {
@@ -72,6 +75,11 @@ class MainActivity : AppCompatActivity() {
 
         filterButton.setOnClickListener {
             showFilterMenu()
+        }
+
+        btnMapMode.setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
         }
 
         loadFestivalsAndFilters()
