@@ -23,4 +23,5 @@
     <color name="buttonColorLight">#63CAF4</color>
     <color name="navbarColorLight">#027DB1</color>
     <color name="cardColorLight">#28CBE1</color>
+    <color name="buttonTextColor">#FFFFFF</color>
 </resources>

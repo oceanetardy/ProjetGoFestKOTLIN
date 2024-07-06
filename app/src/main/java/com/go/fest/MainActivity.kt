@@ -217,6 +217,8 @@ class MainActivity : AppCompatActivity() {
         typeTextView.gravity = Gravity.CENTER
         typeTextView.textSize = 18f
         typeTextView.setTextColor(Color.BLACK)
+        typeTextView.setTypeface(null, Typeface.BOLD_ITALIC)
+
 
         rootLayout.addView(typeTextView)
 
@@ -264,6 +266,8 @@ class MainActivity : AppCompatActivity() {
         )
         button.text = "Détails"
         button.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.button_style)
+        button.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.buttonTextColor))
+
         button.setOnClickListener {
             val intent = Intent(this, DetailsActivity::class.java)
             intent.putExtra("FESTIVAL_ID", festival.identifiant)
