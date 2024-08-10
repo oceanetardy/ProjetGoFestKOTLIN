@@ -1,5 +1,3 @@
-// ApiCall.kt
-
 package com.go.fest
 
 import retrofit2.Retrofit
@@ -37,7 +35,6 @@ data class Festival(
     val identifiant_agence_a: String?,
     val identifiant: String?,
     val geocodage_xy: GeocodageXY?
-
 )
 
 data class GeocodageXY(
@@ -50,15 +47,29 @@ data class FestivalResponse(
 )
 
 interface FestivalApiService {
+
+    /**
+     * Retrieve a list of festivals
+     *
+     * @param limit The maximum number of results to return
+     * @param offset The offset from the start of the results
+     * @param refine A query parameter to filter results
+     * @return [FestivalResponse] containing a list of festivals
+     */
     @GET("api/explore/v2.1/catalog/datasets/festivals-global-festivals-_-pl/records")
     suspend fun getFestivals(
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
-        @Query("refine.departement_principal_de_deroulement") departement: String? = null,
-        @Query("refine.commune_principale_de_deroulement") city: String? = null,
-        @Query("refine.discipline_dominante") discipline: String? = null
+        @Query("refine") refine: String? = null
     ): FestivalResponse
 
+    /**
+     * Retrieve single festival based on a where (generally by id)
+     *
+     * @param whereClause The condition to filter the festival
+     * @param limit The maximum number of results to return (default is 1)
+     * @return [FestivalResponse] containing the festival that matches the condition
+     */
     @GET("api/explore/v2.1/catalog/datasets/festivals-global-festivals-_-pl/records")
     suspend fun getOneFestival(
         @Query("where") whereClause: String,
@@ -66,6 +77,9 @@ interface FestivalApiService {
     ): FestivalResponse
 }
 
+/**
+ * Object for creating the Retrofit client and access Festival API service
+ */
 object ApiClient {
     private const val BASE_URL = "https://data.culture.gouv.fr/"
 

@@ -9,4 +9,9 @@
     <item
         android:id="@+id/filter_discipline"
         android:title="Filtrer par discipline artistique" />
+    <item
+        android:id="@+id/reset_filters"
+        android:title="Réinitialiser filtres"
+        android:background="@drawable/menu_item_background"
+        android:titleTextAppearance="@style/MenuItemTextStyle"/>
 </menu>

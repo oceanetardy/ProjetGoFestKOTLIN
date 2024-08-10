@@ -23,8 +23,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -64,24 +64,28 @@ class MainActivity : AppCompatActivity() {
         scrollView = findViewById(R.id.scrollView)
         fab = findViewById(R.id.fab)
         totalFestivalsTextView = findViewById(R.id.total_festivals)
-        filterButton = findViewById(R.id.btn_filter)
+        filterButton = findViewById(R.id.btn_filtre)
         btnMapMode = findViewById(R.id.btn_map_mode)
         progressBar = findViewById(R.id.progress_bar)
 
+        // Load more festivals on scroll
         scrollView.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
             if (!scrollView.canScrollVertically(1) && scrollY > oldScrollY && !isLoading) {
                 loadMoreFestivals()
             }
         }
 
+        // Scroll to top
         fab.setOnClickListener {
             scrollView.smoothScrollTo(0, 0)
         }
 
+        // Show filter menu
         filterButton.setOnClickListener {
             showFilterMenu()
         }
 
+        // Switch to map mode
         btnMapMode.setOnClickListener {
             val intent = Intent(this, MapActivity::class.java)
             startActivity(intent)
@@ -90,6 +94,9 @@ class MainActivity : AppCompatActivity() {
         loadFestivalsAndFilters()
     }
 
+    /**
+     * Shows a popup menu with filter options (department, city, discipline)
+     */
     private fun showFilterMenu() {
         val popup = PopupMenu(this, filterButton)
         popup.menuInflater.inflate(R.menu.filter_menu, popup.menu)
@@ -104,12 +111,25 @@ class MainActivity : AppCompatActivity() {
                 R.id.filter_discipline -> {
                     showFilterDialog("discipline")
                 }
+                R.id.reset_filters -> {
+                    selectedDepartement = null
+                    selectedCity = null
+                    selectedDiscipline = null
+
+                    resetAndLoadFestivals()
+                }
             }
             true
         }
         popup.show()
     }
 
+    /**
+     * Shows a dialog for selecting a filter option (department, city, or discipline).
+     * Resets other filters when a new one is selected.
+     *
+     * @param filterType Type of filter (department, city, or discipline).
+     */
     private fun showFilterDialog(filterType: String) {
         val options = when (filterType) {
             "departement" -> getDepartments()
@@ -121,12 +141,17 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this@MainActivity)
         builder.setTitle("Select $filterType")
         builder.setItems(options.toTypedArray()) { _, which ->
+            // Reset all filters when a new one is selected
+            selectedDepartement = null
+            selectedCity = null
+            selectedDiscipline = null
+
             when (filterType) {
                 "departement" -> selectedDepartement = options[which]
                 "ville" -> selectedCity = options[which]
                 "discipline" -> selectedDiscipline = options[which]
             }
-            Log.d("MainActivity", "Selected $filterType: ${options[which]}")
+
             resetAndLoadFestivals()
         }
 
@@ -153,20 +178,42 @@ class MainActivity : AppCompatActivity() {
         loadMoreFestivals()
     }
 
+    /**
+     * Loads more festivals based on the current offset and applies any selected filters.
+     */
     @SuppressLint("SetTextI18n")
     private fun loadMoreFestivals() {
         isLoading = true
         showLoading()
-        GlobalScope.launch(Dispatchers.Main) {
+
+        CoroutineScope(Dispatchers.Main).launch {
             try {
-                Log.d("MainActivity", "Loading festivals with filters - Region: $selectedRegion, Departement: $selectedDepartement, City: $selectedCity, Discipline: $selectedDiscipline")
+                val refineParameters = mutableListOf<String>()
+
+                if (!selectedDepartement.isNullOrEmpty()) {
+                    refineParameters.add("departement_principal_de_deroulement:\"$selectedDepartement\"")
+                }
+                if (!selectedCity.isNullOrEmpty()) {
+                    refineParameters.add("commune_principale_de_deroulement:\"$selectedCity\"")
+                }
+                if (!selectedDiscipline.isNullOrEmpty()) {
+                    refineParameters.add("discipline_dominante:\"$selectedDiscipline\"")
+                }
+
+                val refineQuery = if (refineParameters.isNotEmpty()) {
+                    refineParameters.joinToString(separator = " AND ")
+                } else {
+                    null
+                }
+
                 val response = ApiClient.festivalApiService.getFestivals(
-                    limit,
-                    offset,
-                    selectedDepartement,
-                    selectedCity,
-                    selectedDiscipline
+                    limit = limit,
+                    offset = offset,
+                    refine = refineQuery
                 )
+
+                Log.d("FILTERED RESPONSE", response.toString())
+
                 offset += limit
                 totalFestivals += response.results.size
                 updateTotalFestivalsTextView()
@@ -184,11 +231,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Updates the TextView that displays the total number of loaded festivals.
+     */
     @SuppressLint("SetTextI18n")
     private fun updateTotalFestivalsTextView() {
         totalFestivalsTextView.text = "Total: $totalFestivals"
     }
 
+    /**
+     * Creates a card view for each festival and add it to festival list.
+     *
+     * @param festival Festival object with data to display.
+     */
     @SuppressLint("SetTextI18n")
     private fun createFestivalCardView(festival: Festival) {
         val rootLayout = LinearLayout(this@MainActivity)
@@ -226,7 +281,6 @@ class MainActivity : AppCompatActivity() {
         typeTextView.textSize = 18f
         typeTextView.setTextColor(Color.BLACK)
         typeTextView.setTypeface(null, Typeface.BOLD_ITALIC)
-
 
         rootLayout.addView(typeTextView)
 
@@ -266,7 +320,6 @@ class MainActivity : AppCompatActivity() {
 
         rootLayout.addView(departmentTextView)
 
-        // Create Button
         val button = Button(this@MainActivity)
         button.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -288,33 +341,51 @@ class MainActivity : AppCompatActivity() {
         festivalList.addView(rootLayout)
     }
 
+    /**
+    * Loads the initial list of festivals and filter options.
+    */
     private fun loadFestivalsAndFilters() {
         isLoading = true
         showLoading()
-        GlobalScope.launch(Dispatchers.Main) {
+
+        CoroutineScope(Dispatchers.Main).launch {
             try {
+                val refineParameters = mutableListOf<String>()
+
+                if (!selectedDepartement.isNullOrEmpty()) {
+                    refineParameters.add("departement_principal_de_deroulement:\"$selectedDepartement\"")
+                }
+                if (!selectedCity.isNullOrEmpty()) {
+                    refineParameters.add("commune_principale_de_deroulement:\"$selectedCity\"")
+                }
+                if (!selectedDiscipline.isNullOrEmpty()) {
+                    refineParameters.add("discipline_dominante:\"$selectedDiscipline\"")
+                }
+
+                val refineQuery = if (refineParameters.isNotEmpty()) {
+                    refineParameters.joinToString(separator = " AND ")
+                } else {
+                    null
+                }
+
                 val response = ApiClient.festivalApiService.getFestivals(
-                    limit,
-                    offset,
-                    selectedDepartement,
-                    selectedCity,
-                    selectedDiscipline
+                    limit = limit,
+                    offset = offset,
+                    refine = refineQuery
                 )
+
                 offset += limit
                 totalFestivals += response.results.size
                 updateTotalFestivalsTextView()
 
-                // Extract unique departments, cities, and disciplines from fetched data
                 departments = response.results.mapNotNull { it.departement_principal_de_deroulement }.distinct()
                 cities = response.results.mapNotNull { it.commune_principale_de_deroulement }.distinct()
                 disciplines = response.results.mapNotNull { it.discipline_dominante }.distinct()
 
-                // Initially load festivals
                 response.results.forEach { festival ->
                     createFestivalCardView(festival)
                 }
             } catch (e: Exception) {
-                Log.e("MainActivity", "Erreur lors du chargement des festivals: ${e.message}", e)
                 showErrorDialog("Erreur lors du chargement des festivals. Vérifiez votre connexion internet et réessayez.")
             } finally {
                 isLoading = false
@@ -331,6 +402,11 @@ class MainActivity : AppCompatActivity() {
         progressBar.visibility = View.GONE
     }
 
+    /**
+     * Shows a dialog with an error message.
+     *
+     * @param message Error message to display.
+     */
     private fun showErrorDialog(message: String) {
         AlertDialog.Builder(this@MainActivity)
             .setTitle("Erreur")

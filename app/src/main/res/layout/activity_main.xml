@@ -26,10 +26,9 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:text="Découvrez des festivals"
+            android:textColor="?android:textColor"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="?android:textColor"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,31 +38,33 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Total: 0"
-            android:textSize="16sp"
             android:textColor="?android:textColor"
+            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subtitlte" />
 
         <Button
-            android:id="@+id/btn_filter"
+            android:id="@+id/btn_filtre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/buttonColor"
             android:maxWidth="50dp"
             android:text="Filtrer"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/btn_map_mode"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/btn_map_mode"
-            android:layout_width="95dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/buttonColor"
+            android:maxWidth="50dp"
             android:text="Carte"
-            android:textColorLink="@color/primaryColor"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_filter" />
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,8 +76,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
         <LinearLayout
             android:id="@+id/festival_list"

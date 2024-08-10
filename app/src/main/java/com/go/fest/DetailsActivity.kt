@@ -89,6 +89,11 @@ class DetailsActivity : AppCompatActivity() {
         mapView.onPause()
     }
 
+    /**
+     * Fetches details of festival based ID
+     *
+     * @param festivalId Identifier of the festival
+     */
     private fun fetchFestivalDetails(festivalId: String) {
         lifecycleScope.launch(Dispatchers.Main) {
             try {
@@ -99,8 +104,6 @@ class DetailsActivity : AppCompatActivity() {
                 val festival = response.results.find { it.identifiant == festivalId }
 
                 if (festival != null) {
-                    Log.d("DetailsActivity", "Festival trouvé: $festival")
-
                     createFestivalDetailsCardView(festival)
                     updateMapWithFestivalLocation(festival)
                 } else {
@@ -114,6 +117,11 @@ class DetailsActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Populates the UI components with the festival's details
+     *
+     * @param festival Object containing the festival's details
+     */
     private fun createFestivalDetailsCardView(festival: Festival) {
         festivalIdTextView.text = festival.identifiant ?: "Identifiant du festival non renseigné"
         festivalName.text = festival.nom_du_festival ?: "Nom du festival non renseigné"
@@ -136,12 +144,15 @@ class DetailsActivity : AppCompatActivity() {
         festivalPeriod.text = festival.periode_principale_de_deroulement_du_festival ?: "Période du festival non renseignée"
     }
 
+    /**
+     * Updates the map view with festival's location and add a marker
+     *
+     * @param festival Object containing festival's location details
+     */
     private fun updateMapWithFestivalLocation(festival: Festival) {
         val latitude = festival.geocodage_xy?.lat ?: 0.0
         val longitude = festival.geocodage_xy?.lon ?: 0.0
         val zoomLevel = 15.0
-
-        Log.d("DetailsActivity", "Latitude: $latitude, Longitude: $longitude")
 
         val mapController = mapView.controller
         mapController.setZoom(zoomLevel)
@@ -165,6 +176,11 @@ class DetailsActivity : AppCompatActivity() {
         mapView.invalidate()
     }
 
+    /**
+     * Handle click event to open festival's location in Google Maps
+     *
+     * @param view The view that was clicked
+     */
     fun openInMaps(view: View) {
         val festivalId = intent.getStringExtra("FESTIVAL_ID")
 
@@ -191,10 +207,14 @@ class DetailsActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Opens the festival's location in Google Maps or a web browser if Google Maps is unavailable
+     *
+     * @param festival Object containing festival's location details
+     */
     private fun openInMaps(festival: Festival) {
         val latitude = festival.geocodage_xy?.lat ?: 0.0
         val longitude = festival.geocodage_xy?.lon ?: 0.0
-        Log.d("DetailsActivity", "Latitude: $latitude, Longitude: $longitude")
 
         val uri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
         val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -208,6 +228,11 @@ class DetailsActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Opens a URL in a web browser
+     *
+     * @param url The URL to be opened
+     */
     private fun openInBrowser(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         if (intent.resolveActivity(packageManager) != null) {
